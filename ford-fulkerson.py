@@ -8,7 +8,7 @@ class Grafo:
     self.n = n
     self.adjacencia = [None]*n
     for i in range(n):
-      self.adjacencia[i] = []
+      self.adjacencia[i] = [0]*n
 
   def __str__(self):
     graph = ''
@@ -19,35 +19,38 @@ class Grafo:
       graph+='\n'
     return graph
 
-  def criar_aresta(self,vi,v):
-    # print(self.adjacencia)
-    self.adjacencia[vi].append(v)
+  def criar_aresta(self, vi, vj, v):
+    self.adjacencia[vi][vj] = v
   
   def visitas(self, source, sink, parent):
     visitado = [False] * self.n
     pilha = [[source, float(inf)]]
   
     while pilha:
+        # print('antes ', pilha)
         u, fluxo = pilha.pop()
+        # print('depois ', pilha, u, fluxo)
+        # print(visitado)
         visitado[u] = True
-        for ind, val in enumerate(self.adjacencia[u]):
-            if visitado[ind] == False and val > 0:
-                if ind == sink:
-                    parent[ind] = u
+        for aresta, var in enumerate(self.adjacencia[u]):
+            # print(aresta, var)
+            if visitado[aresta] == False and var > 0:
+                if aresta == sink:
+                    parent[aresta] = u
                     return fluxo
-                pilha.append([ind, min(fluxo, val)])
-                parent[ind] = u
+                pilha.append([aresta, min(fluxo, var)])
+                parent[aresta] = u
     return 0
   
   def ford_fulkerson(self, source, sink):
     parent = [-1] * self.n
     max_fluxo = 0
     
-    path = True
-    while path:
+    while True:
         path_fluxo = self.visitas(source, sink, parent)
+        # print(path_fluxo)
         if path_fluxo == 0:
-            path = False
+            break
         max_fluxo += path_fluxo
     
         v = sink
@@ -61,43 +64,20 @@ class Grafo:
     return max_fluxo
   
 g = Grafo(6)
-g.criar_aresta(0, 0)
-g.criar_aresta(0,16)
-g.criar_aresta(0, 13)
-g.criar_aresta(0, 0)
-g.criar_aresta(0, 0)
-g.criar_aresta(0, 0)
-g.criar_aresta(1, 0)
-g.criar_aresta(1, 0)
-g.criar_aresta(1, 10)
-g.criar_aresta(1,12)
-g.criar_aresta(1, 0)
-g.criar_aresta(1, 0)
-g.criar_aresta(2, 0)
-g.criar_aresta(2, 4)
-g.criar_aresta(2, 0)
-g.criar_aresta(2, 0)
-g.criar_aresta(2, 14)
-g.criar_aresta(2, 0)
-g.criar_aresta(3, 0)
-g.criar_aresta(3, 0)
-g.criar_aresta(3, 9)
-g.criar_aresta(3, 0)
-g.criar_aresta(3, 0)
-g.criar_aresta(3, 20)
-g.criar_aresta(4, 0)
-g.criar_aresta(4, 0)
-g.criar_aresta(4, 0)
-g.criar_aresta(4, 7)
-g.criar_aresta(4, 0)
-g.criar_aresta(4, 4)
-g.criar_aresta(5, 0)
-g.criar_aresta(5, 0)
-g.criar_aresta(5, 0)
-g.criar_aresta(5, 0)
-g.criar_aresta(5, 0)
+g.criar_aresta(0,1, 16)
+g.criar_aresta(0, 2, 13)
+g.criar_aresta(1, 2, 10)
+g.criar_aresta(1, 3, 12)
+g.criar_aresta(2, 1, 4)
+g.criar_aresta(2, 4, 14)
+g.criar_aresta(3, 2, 9)
+g.criar_aresta(3, 5, 20)
+g.criar_aresta(4, 3, 7)
+g.criar_aresta(4, 5, 4)
 source = 0
 sink = 5
-
-max_fluxo = g.ford_fulkerson(source, sink)
-print(max_fluxo)
+print(g)
+print()
+print(g.adjacencia)
+fluxo_maximo = g.ford_fulkerson(source, sink)
+print('Fluxo máximo: ', fluxo_maximo)
